@@ -1,48 +1,50 @@
 module Mahsjong where
 
-import           System.Random
+import           GHC.Enum
 
-data TileSet = Character
-             | Circle
-             | Bamboo
-             | Wind
-             | Dragon
-               deriving Show
+data CharacterTile = CharacterTile Int Bool Bool deriving Show
 
-instance Eq TileSet where
-  Character == Character = True
-  Circle == Circle = True
-  Bamboo == Bamboo = True
-  Wind == Wind = True
-  Dragon == Dragon = True
-  _ == _ = False
+instance Tile CharacterTile where
+  position (CharacterTile a _ _) = a
+  isDora (CharacterTile _ b _ ) = b
+  isShown (CharacterTile _ _ c) = c
 
-data Tile = Tile
-            { tilePosition :: Int
-            , tileSet      :: TileSet
-            , tileDora     :: Bool
-            , tileShown    :: Bool
-            } deriving Show
+instance Eq CharacterTile where
+  CharacterTile a _ _ == CharacterTile b _ _ = a == b
 
-instance Eq Tile where
-  a == b | tileSet a == tileSet b = tilePosition a == tilePosition b
-         | otherwise = False
+instance Bounded CharacterTile where
+  minBound = CharacterTile 1 False False
+  maxBound = CharacterTile 9 False False
 
-instance Ord Tile where
-  compare a b = compare (tilePosition a) (tilePosition b)
+instance Enum CharacterTile where
+  toEnum n | n >= 1, n <= 9 = CharacterTile n False False
+  toEnum _ = error "CharacterTile.toEnum: bad argument"
 
-genTileSet :: [([Int], TileSet, Bool)] -> [Tile]
-genTileSet [] = []
-genTileSet ((a, b, c):xs) = map (\n -> Tile n b False c) a ++ genTileSet xs
+  fromEnum (CharacterTile a _ _) = a
 
-vanillaTiles :: [Tile]
-vanillaTiles = concat $ replicate 4 $ genTileSet [ ([1..9], Character, False)
-                                                 , ([1..9], Circle, False)
-                                                 , ([1..9], Bamboo, False)
-                                                 , ([1..4], Wind, False)
-                                                 , ([1..3], Dragon, False)
-                                                 ]
+  enumFrom = boundedEnumFrom
+  enumFromThen = boundedEnumFromThen
 
+class Tile a where
+  -- What is the position of the tile (e.g. East wind is the first wind tile)
+  position :: a -> Int
+
+  -- Is this tile a dora?
+  isDora :: a -> Bool
+
+  -- Is this tile currently shown?
+  isShown :: a -> Bool
+
+  -- Is this tile an end? Generally they are the min and max bounds
+  isEnd :: (Eq a, Bounded a) => a -> Bool
+  isEnd a | a == minBound, a == maxBound = True
+                              | otherwise = False
+
+  doraIndicator :: (Eq a, Enum a, Bounded a) => a -> a
+  doraIndicator a | a /= maxBound = succ a
+                  | otherwise = minBound
+
+{-
 data Mahjong = Mahjong
                  -- Drawing pile - East, South, West, North, Dora
                { mahjongWall      :: ([Tile], [Tile], [Tile], [Tile], [Tile])
@@ -54,8 +56,9 @@ data Mahjong = Mahjong
                , mahjongDiscard   :: ([Tile], [Tile], [Tile], [Tile])
 
                  -- Player hands - East, South, West, North
-               , mahjongHands     :: ([Tile], [Tile], [Tile], [Tile])
+               , mahjongHand      :: ([Tile], [Tile], [Tile], [Tile])
                }
 
 -- determineBreak ::  Integer
 -- determineBreak = mod (lift getStdRandom (randomR (2, 12))) 4
+-}
