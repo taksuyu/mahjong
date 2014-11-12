@@ -37,9 +37,10 @@ class Tile a where
 
   -- Is this tile an end? Generally they are the min and max bounds
   isEnd :: (Eq a, Bounded a) => a -> Bool
-  isEnd a | a == minBound, a == maxBound = True
+  isEnd a | a == minBound || a == maxBound = True
           | otherwise = False
 
+  -- A dora is the tile after the given tile in the same set
   doraIndicator :: (Eq a, Enum a, Bounded a) => a -> a
   doraIndicator a | a /= maxBound = succ a
                   | otherwise = minBound
