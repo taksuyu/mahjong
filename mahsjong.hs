@@ -61,20 +61,20 @@ data Mahjong = Mahjong
                }
 
 -- Helper functions --
-getEastWall, getSouthWall, getWestWall, getNorthWall, getDora :: Tile a => Mahjong -> a
+getEastWall, getSouthWall, getWestWall, getNorthWall, getDora :: Tile a => Mahjong -> [a]
 getEastWall a = sel1 $ mahjongWall a
 getSouthWall a = sel2 $ mahjongWall a
 getWestWall a = sel3 $ mahjongWall a
 getNorthWall a = sel4 $ mahjongWall a
 getDora a = sel5 $ mahjongWall a
 
-getEastDiscard, getSouthDiscard, getWestDiscard, getNorthDiscard :: Tile a => Mahjong -> a
+getEastDiscard, getSouthDiscard, getWestDiscard, getNorthDiscard :: Tile a => Mahjong -> [a]
 getEastDiscard a = sel1 $ mahjongDiscard a
 getSouthDiscard a = sel2 $ mahjongDiscard a
 getWestDiscard a = sel3 $ mahjongDiscard a
 getNorthDiscard a = sel4 $ mahjongDiscard a
 
-getEastHand, getSouthHand, getWestHand, getNorthHand :: Tila a => Mahjong -> a
+getEastHand, getSouthHand, getWestHand, getNorthHand :: Tila a => Mahjong -> [a]
 getEastHand a = sel1 $ mahjongHand a
 getSouthHand a = sel2 $ mahjongHand a
 getWestHand a = sel3 $ mahjongHand a
