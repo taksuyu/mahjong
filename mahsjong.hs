@@ -74,7 +74,7 @@ getSouthDiscard a = sel2 $ mahjongDiscard a
 getWestDiscard a = sel3 $ mahjongDiscard a
 getNorthDiscard a = sel4 $ mahjongDiscard a
 
-getEastHand, getSouthHand, getWestHand, getNorthHand :: Tila a => Mahjong -> [a]
+getEastHand, getSouthHand, getWestHand, getNorthHand :: Tile a => Mahjong -> [a]
 getEastHand a = sel1 $ mahjongHand a
 getSouthHand a = sel2 $ mahjongHand a
 getWestHand a = sel3 $ mahjongHand a
