@@ -1,5 +1,6 @@
 module Mahsjong where
 
+import           Data.Tuple.Select
 import           GHC.Enum
 
 data CharacterTile = CharacterTile Int Bool Bool deriving Show
@@ -45,21 +46,39 @@ class Tile a where
   doraIndicator a | a /= maxBound = succ a
                   | otherwise = minBound
 
-{-
 data Mahjong = Mahjong
                  -- Drawing pile - East, South, West, North, Dora
-               { mahjongWall      :: ([Tile], [Tile], [Tile], [Tile], [Tile])
+               { mahjongWall      :: Tile a => ([a], [a], [a], [a], [a])
 
                  -- Determines wall break
                , mahjongWallStart :: Int
 
                  -- Discard piles - East, South, West, North
-               , mahjongDiscard   :: ([Tile], [Tile], [Tile], [Tile])
+               , mahjongDiscard   :: Tile a => ([a], [a], [a], [a])
 
                  -- Player hands - East, South, West, North
-               , mahjongHand      :: ([Tile], [Tile], [Tile], [Tile])
+               , mahjongHand      :: Tile a => ([a], [a], [a], [a])
                }
 
--- determineBreak ::  Integer
+-- Helper functions --
+getEastWall, getSouthWall, getWestWall, getNorthWall, getDora :: Tile a => Mahjong -> a
+getEastWall a = sel1 $ mahjongWall a
+getSouthWall a = sel2 $ mahjongWall a
+getWestWall a = sel3 $ mahjongWall a
+getNorthWall a = sel4 $ mahjongWall a
+getDora a = sel5 $ mahjongWall a
+
+getEastDiscard, getSouthDiscard, getWestDiscard, getNorthDiscard :: Tile a => Mahjong -> a
+getEastDiscard a = sel1 $ mahjongDiscard a
+getSouthDiscard a = sel2 $ mahjongDiscard a
+getWestDiscard a = sel3 $ mahjongDiscard a
+getNorthDiscard a = sel4 $ mahjongDiscard a
+
+getEastHand, getSouthHand, getWestHand, getNorthHand :: Tila a => Mahjong -> a
+getEastHand a = sel1 $ mahjongHand a
+getSouthHand a = sel2 $ mahjongHand a
+getWestHand a = sel3 $ mahjongHand a
+getNorthHand a = sel4 $ mahjongHand a
+
+-- determineBreak :: Int
 -- determineBreak = mod (lift getStdRandom (randomR (2, 12))) 4
--}
