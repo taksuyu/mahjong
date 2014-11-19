@@ -1,4 +1,8 @@
+# Haskell
 *.o
 *.hi
+
+# Cabal
 .cabal*
 cabal*
+dist
