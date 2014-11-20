@@ -40,3 +40,30 @@ isEnd a | a == tileType a 1 || a == tileMaxBound a = True
         | otherwise = False
 
 isSimple a = not $ isEnd a
+
+data MTile = MTile
+             { tile :: Tile
+             , isShown :: Bool
+             , isDora :: Bool
+             } deriving (Show)
+
+type Pile = Seq MTile
+
+data Player = East
+            | South
+            | West
+            | North
+            deriving (Show)
+
+data Wall = Wall
+            { wallTiles :: Pile
+            , doraTiles :: Pile
+              -- Where we start getting the dora tiles
+            , doraOffset :: Int
+            } deriving (Show)
+
+data Mahjong = Mahjong
+               { wall :: Wall
+               , discardPile :: Seq (Player, Pile, Maybe Int)
+               , playerHand :: Seq (Player, Pile)
+               } deriving (Show)
