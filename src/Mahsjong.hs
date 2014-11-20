@@ -1,5 +1,7 @@
 module Mahsjong where
 
+import           Data.Sequence
+
 data Tile = Character Int
           | Circle Int
           | Bamboo Int
@@ -42,9 +44,9 @@ isEnd a | a == tileType a 1 || a == tileMaxBound a = True
 isSimple a = not $ isEnd a
 
 data MTile = MTile
-             { tile :: Tile
+             { tile    :: Tile
              , isShown :: Bool
-             , isDora :: Bool
+             , isDora  :: Bool
              } deriving (Show)
 
 type Pile = Seq MTile
@@ -56,14 +58,14 @@ data Player = East
             deriving (Show)
 
 data Wall = Wall
-            { wallTiles :: Pile
-            , doraTiles :: Pile
+            { wallTiles  :: Pile
+            , doraTiles  :: Pile
               -- Where we start getting the dora tiles
             , doraOffset :: Int
             } deriving (Show)
 
 data Mahjong = Mahjong
-               { wall :: Wall
+               { wall        :: Wall
                , discardPile :: Seq (Player, Pile, Maybe Int)
-               , playerHand :: Seq (Player, Pile)
+               , playerHand  :: Seq (Player, Pile)
                } deriving (Show)
