@@ -35,6 +35,10 @@ tileType Bamboo {}    = Bamboo
 tileType Wind {}      = Wind
 tileType Dragon {}    = Dragon
 
+-- NOTE: Bit hacky, but works
+sameTileType :: Tile -> Tile -> Bool
+sameTileType a b = tileType a 1 == tileType b 1
+
 --------------------------------------------------------------------------------
 tileMinBound, tileMaxBound, nextDora :: Tile -> Tile
 --------------------------------------------------------------------------------
