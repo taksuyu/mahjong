@@ -1,7 +1,8 @@
 module Mahsjong where
 
-import           Data.Sequence
+import           Data.Sequence as DS
 
+--import           Mahsjong.Hand
 import           Mahsjong.Tile
 
 data MTile = MTile

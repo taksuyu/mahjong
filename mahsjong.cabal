@@ -18,7 +18,8 @@ cabal-version:       >=1.10
 library
   exposed-modules:
     Mahsjong,
-    Mahsjong.Tile
+    Mahsjong.Tile,
+    Mahsjong.Hand
   -- other-modules:       
   -- other-extensions:    
   build-depends:
