@@ -33,24 +33,45 @@ isQuad a b | tileIn a b == 4 = True
 -- an index that isn't a Wind or Dragon then you have a run in that
 -- hand.
 --------------------------------------------------------------------------------
-oTF a b | tileMaxBound a == a = False
+oTF a b | isHonor a || tileMaxBound a == a = False
         | tileIn (succ a) b >= 1 = True
         | otherwise = False
 
-tTF a b | tMB a == a || tMB sa == sa = False
+tTF a b | isHonor a || tMB a == a || tMB sa == sa = False
         | tileIn (succ sa) b >= 1 = True
         | otherwise = False
   where
     tMB = tileMaxBound
     sa = succ a
 
-oTB a b | tileMinBound a == a = False
+oTB a b | isHonor a || tileMinBound a == a = False
         | tileIn (pred a) b >= 1 = True
         | otherwise = False
 
-tTB a b | tMB a == a || tMB pa == pa = False
+tTB a b | isHonor a || tMB a == a || tMB pa == pa = False
         | tileIn (pred pa) b >= 1 = True
         | otherwise = False
   where
     tMB = tileMinBound
     pa = pred a
+
+--------------------------------------------------------------------------------
+oTFtTF, oTFoTB, oTBtTB :: Tile -> [Tile] -> Maybe Meld
+--------------------------------------------------------------------------------
+oTFtTF a b | oTF a b && tTF a b = Just $ Run (a, sa, ssa)
+           | otherwise = Nothing
+  where
+    sa = succ a
+    ssa = succ sa
+
+oTFoTB a b | oTF a b && oTB a b = Just $ Run (pa, a, sa)
+           | otherwise = Nothing
+  where
+    pa = pred a
+    sa = succ a
+
+oTBtTB a b | oTB a b && tTB a b = Just $ Run (ppa, pa, a)
+           | otherwise = Nothing
+  where
+    pa = pred a
+    ppa = pred pa

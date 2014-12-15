@@ -52,16 +52,17 @@ nextDora a | a /= tileMaxBound a = succ a
            | otherwise = tileMinBound a
 
 --------------------------------------------------------------------------------
-isTerminal, isEnd, isSimple :: Tile -> Bool
+isHonor, isTerminal, isEnd, isSimple :: Tile -> Bool
 --------------------------------------------------------------------------------
-isTerminal Wind {} = False
-isTerminal Dragon {} = False
-isTerminal a | a == tileMinBound a || a == tileMaxBound a = True
+isHonor Wind {} = True
+isHonor Dragon {} = True
+isHonor _ = False
+
+isTerminal a | isHonor a = False
+             | a == tileMinBound a || a == tileMaxBound a = True
              | otherwise = False
 
-isEnd Wind {} = True
-isEnd Dragon {} = True
-isEnd a | isTerminal a = True
+isEnd a | isTerminal a || isHonor a = True
         | otherwise = False
 
 isSimple a = not $ isEnd a
