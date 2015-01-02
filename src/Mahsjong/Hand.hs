@@ -33,26 +33,24 @@ isQuad a b | tileIn a b == 4 = True
 -- an index that isn't a Wind or Dragon then you have a run in that
 -- hand.
 --------------------------------------------------------------------------------
-oTF a b | isHonor a || tileMaxBound a == a = False
+oTF a b | isEnd a = False
         | tileIn (succ a) b >= 1 = True
         | otherwise = False
 
-tTF a b | isHonor a || tMB a == a || tMB sa == sa = False
+tTF a b | isEnd a || isEnd sa = False
         | tileIn (succ sa) b >= 1 = True
         | otherwise = False
   where
-    tMB = tileMaxBound
     sa = succ a
 
-oTB a b | isHonor a || tileMinBound a == a = False
+oTB a b | isEnd a = False
         | tileIn (pred a) b >= 1 = True
         | otherwise = False
 
-tTB a b | isHonor a || tMB a == a || tMB pa == pa = False
+tTB a b | isEnd a || isEnd pa = False
         | tileIn (pred pa) b >= 1 = True
         | otherwise = False
   where
-    tMB = tileMinBound
     pa = pred a
 
 --------------------------------------------------------------------------------
