@@ -6,3 +6,6 @@
 .cabal*
 cabal*
 dist
+
+# FPComplete
+.project-settings.yml
