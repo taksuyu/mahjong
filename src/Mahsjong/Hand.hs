@@ -37,7 +37,7 @@ oTF a b | isEnd a = False
         | tileIn (succ a) b >= 1 = True
         | otherwise = False
 
-tTF a b | isEnd a || isEnd sa = False
+tTF a b | isEnd sa = False
         | tileIn (succ sa) b >= 1 = True
         | otherwise = False
   where
@@ -47,7 +47,7 @@ oTB a b | isEnd a = False
         | tileIn (pred a) b >= 1 = True
         | otherwise = False
 
-tTB a b | isEnd a || isEnd pa = False
+tTB a b | isEnd pa = False
         | tileIn (pred pa) b >= 1 = True
         | otherwise = False
   where
