@@ -28,7 +28,7 @@ position (Bamboo a)    = a
 position (Wind a)      = a
 position (Dragon a)    = a
 
-tileType :: Tile -> (Int -> Tile)
+tileType :: Tile -> Int -> Tile
 tileType Character {} = Character
 tileType Circle {}    = Circle
 tileType Bamboo {}    = Bamboo

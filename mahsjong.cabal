@@ -4,15 +4,12 @@
 name:                Mahsjong
 version:             0.1.0.0
 synopsis:            Japanese Riichi Mahjong library
--- description:         
 license:             MIT
 license-file:        LICENSE
 author:              TakSuyu
 maintainer:          tak@ispabuse.org
--- copyright:           
 category:            Game
 build-type:          Simple
--- extra-source-files:  
 cabal-version:       >=1.10
 
 library
@@ -20,11 +17,9 @@ library
     Mahsjong,
     Mahsjong.Tile,
     Mahsjong.Hand
-  -- other-modules:       
-  -- other-extensions:    
   build-depends:
-    base		>=4.7		&& <4.8,
-    containers		>=0.5.5.1 	&& <0.5.6
+    base             >= 4.7     && < 4.8,
+    containers       >= 0.5.5.1 && < 0.5.6
   hs-source-dirs:
     src
   default-language:

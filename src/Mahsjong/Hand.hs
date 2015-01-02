@@ -14,7 +14,7 @@ tileIn :: Tile -> [Tile] -> Int
 tileIn a b = length $ elemIndices a b
 
 filterTile :: Tile -> [Tile] -> [Tile]
-filterTile a b = filter (\n -> a /= n) b
+filterTile a = filter (\n -> a /= n)
 
 --------------------------------------------------------------------------------
 isDouble, isSet, isQuad, oTF, tTF, oTB, tTB :: Tile -> [Tile] -> Bool
