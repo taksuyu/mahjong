@@ -2,19 +2,40 @@ module Mahsjong.Hand where
 
 import           Mahsjong.Tile
 
-import           Data.List
+import           Data.List     as L
+import           Data.Set      as S
 
-data Meld = Pair Tile
-          | Set Tile
+
+-- Melds are the parts of a hand that are already finished. If you are
+-- looking for a pair then you want a valid Set wait (SetW).
+data Meld = Set  Tile
           | Quad Tile
           | Run (Tile, Tile, Tile)
           deriving (Eq, Show)
 
+
+-- We can use waits to determine what is still needed to finish a
+-- hand. It'll also tell us how many tiles a hand was waiting on for
+-- scoring by counting how many waits there were.
+data Wait = PairW Tile
+          | SetW  Tile
+          | RunW [Tile]
+          deriving (Show)
+
+waits :: Wait -> Set Tile
+waits (PairW a) = fromList $ a:[]
+waits (SetW  a) = fromList $ a:[]
+waits (RunW  a) = fromList a
+
+
+--------------------------------------------------------------------------------
+-- Some handling functions
+--------------------------------------------------------------------------------
 tileIn :: Tile -> [Tile] -> Int
 tileIn a b = length $ elemIndices a b
 
 filterTile :: Tile -> [Tile] -> [Tile]
-filterTile a = filter (\n -> a /= n)
+filterTile a = L.filter (\n -> a /= n)
 
 --------------------------------------------------------------------------------
 isDouble, isSet, isQuad, oTF, tTF, oTB, tTB :: Tile -> [Tile] -> Bool
