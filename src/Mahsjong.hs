@@ -2,7 +2,7 @@ module Mahsjong where
 
 import           Data.Sequence as DS
 
---import           Mahsjong.Hand
+import           Mahsjong.Hand
 import           Mahsjong.Tile
 
 data MTile = MTile
