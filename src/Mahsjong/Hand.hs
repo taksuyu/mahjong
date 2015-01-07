@@ -55,17 +55,17 @@ isQuad a b | tileIn a b == 4 = True
 -- If oTF and tTF exist in a given hand for an index that isn't a Wind
 -- or Dragon then you have a run in that hand.
 --------------------------------------------------------------------------------
-oTF a@(Simple b c) d | terminal a = False
-                     | tileIn (Simple b $ succ c) d >= 1 = True
-oTF _ _              = False
+oTF a@(Suits b c) d | terminal a                       = False
+                    | tileIn (Suits b $ succ c) d >= 1 = True
+oTF _ _             = False
 
-tTF a@(Simple b c) d | terminal a || terminal (Simple b $ succ c) = False
-                     | tileIn (Simple b $ succ $ succ c) d >= 1 = True
-tTF _ _              = False
+tTF a@(Suits b c) d | terminal a || terminal (Suits b $ succ c) = False
+                    | tileIn (Suits b $ succ $ succ c) d >= 1   = True
+tTF _ _             = False
 
 --------------------------------------------------------------------------------
 oTFtTF :: Tile -> [Tile] -> Maybe Meld
 --------------------------------------------------------------------------------
-oTFtTF a@(Simple b c) d | oTF a d && tTF a d
-                        = Just $ Run $ fromList [a, Simple b $ succ c, Simple b $ succ $ succ c]
-oTFtTF _ _              = Nothing
+oTFtTF a@(Suits b c) d | oTF a d && tTF a d
+                       = Just $ Run $ fromList [a, Suits b $ succ c, Suits b $ succ $ succ c]
+oTFtTF _ _             = Nothing

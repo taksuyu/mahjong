@@ -16,7 +16,7 @@ data Cardinal = East | South | North | West
 data Color = Red  | Green | White
            deriving (Eq, Ord, Show)
 
-data Tile = Simple Suit TNum
+data Tile = Suits Suit TNum
           | Wind Cardinal
           | Dragon Color
           deriving (Eq, Ord, Show)
@@ -29,12 +29,12 @@ honor, simple, terminal, end :: Tile -> Bool
 honor = not . simple
 
 -- Simples are the opposite of Ends
-simple Simple {} = True
-simple _         = False
+simple a@Suits {} | not $ terminal a = True
+simple _                             = False
 
 -- Terminals are anything that isn't an honor but is the lowest and
 -- highest tile in the sequence.
-terminal (Simple _ a) | a == minBound || a == maxBound = True
+terminal (Suits _ a) | a == minBound || a == maxBound = True
 terminal _            = False
 
 -- Ends are terminals and honors.
