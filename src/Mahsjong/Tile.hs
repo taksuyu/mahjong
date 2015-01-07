@@ -10,7 +10,7 @@ data Suit = Character
           | Bamboo
           deriving (Eq, Ord, Show)
 
-data Cardinal = East | South | North | West
+data Cardinal = East | South | West | North
               deriving (Eq, Ord, Show)
 
 data Color = Red  | Green | White
@@ -24,8 +24,7 @@ data Tile = Suits Suit TNum
 --------------------------------------------------------------------------------
 honor, simple, terminal, end :: Tile -> Bool
 --------------------------------------------------------------------------------
--- Honor are tiles that cannot be made into a sequence (i.e. Run,
--- Mentsu).
+-- Honor are tiles that cannot be made into a sequence (i.e. Run, Mentsu).
 honor = not . simple
 
 -- Simples are the opposite of Ends
@@ -35,7 +34,7 @@ simple _                             = False
 -- Terminals are anything that isn't an honor but is the lowest and
 -- highest tile in the sequence.
 terminal (Suits _ a) | a == minBound || a == maxBound = True
-terminal _            = False
+terminal _           = False
 
 -- Ends are terminals and honors.
 end a | terminal a || honor a   = True
