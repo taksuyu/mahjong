@@ -1,4 +1,4 @@
-module Cycle (Cycle(..)) where
+module Mahsjong.Cycle (Cycle(..), wrapForward, wrapBackward) where
 
 -- | A class for things you can increment, but which wrap around.
 -- If you have x, which is in a cycle, you should be able to get x back by
@@ -15,3 +15,13 @@ instance Cycle Bool where
 instance Cycle () where
   next = id
   prev = id
+
+-- | Simple wrapper for going forward.
+wrapForward :: (Eq a, Enum a, Bounded a) => a -> a
+wrapForward a | a /= maxBound = succ a
+              | otherwise     = minBound
+
+-- | Simple wrapper for going backwards.
+wrapBackward :: (Eq a, Enum a, Bounded a) => a -> a
+wrapBackward a | a /= minBound = pred a
+               | otherwise     = maxBound
