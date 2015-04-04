@@ -69,8 +69,8 @@ simple _                             = False
 
 -- | Terminals, like Simples, can be made into sequence and designate
 -- the start and finish of a Suit.
-terminal (Suits _ a) | a == Nine || a == Nine = True
-terminal _                                    = False
+terminal (Suits _ a) | a == One || a == Nine = True
+terminal _                                   = False
 
 -- | Ends are the collection of Terminals and Honors.
 end a | terminal a || honor a   = True
