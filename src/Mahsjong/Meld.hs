@@ -6,8 +6,8 @@ import           Mahsjong.Tile
 --
 -- Some exceptions to this are hands like Chiitoitsu (Seven Pairs) or
 -- Thirteen Orphans (A Pair of one End, and one of every other End).
-data Meld = Run (Tile, Tile, Tile)
-          | Set Tile
-          | Quad Tile
+data Meld = Run Tile Tile Tile -- ^ Sequential tiles that don't wrap
+          | Set Tile           -- ^ Three of a tile
+          | Quad Tile          -- ^ Four of a tile
           deriving (Eq, Show)
 
