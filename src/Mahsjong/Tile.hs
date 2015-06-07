@@ -76,7 +76,7 @@ terminal _                                   = False
 end a | terminal a || honor a   = True
       | otherwise               = False
 
-suit Suit {} = True
+suit Suits {} = True
 suit _       = False
 
 --------------------------------------------------------------------------------
