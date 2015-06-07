@@ -1,5 +1,7 @@
 language: haskell
-ghc: 7.8
+ghc:
+  - 7.6
+  - 7.8
 notifications:
   slack:
     secure: sCABISCGtbbHU02F4enQ1JncfmUOEa+mK7UEQ+OapmrXv1I5lWCX11FlEWjAh4SWDyd534cilPJ8Jnu+zSUut+vA9VMAP9MGOb2mfhVi+jIDwvk5xGIJGYTCl1YpUwhgaWPTRA41NuNWmDsK8lK2knmZAoFxzqu42Jp8WTCKWjg=
