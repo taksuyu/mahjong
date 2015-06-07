@@ -1,6 +1,6 @@
 name:                Mahsjong
-version:             0.1.0.0
-synopsis:            Japanese Riichi Mahjong library
+version:             0.0.0.0
+synopsis:            Mahjong library
 license:             MIT
 license-file:        LICENSE
 author:              taksuyu
