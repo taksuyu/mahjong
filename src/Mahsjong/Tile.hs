@@ -58,10 +58,10 @@ instance Cycle Tile where
   prev (Dragon a)  = Dragon $ wrapBackward a
 
 --------------------------------------------------------------------------------
-honor, simple, terminal, end :: Tile -> Bool
+honor, simple, terminal, end, suit :: Tile -> Bool
 --------------------------------------------------------------------------------
 -- | Honors are tiles that cannot be made into a sequence (i.e. Run/Mentsu).
-honor = not . simple
+honor = not . suit
 
 -- | Simples can be made into runs, but exclude Terminals.
 simple a@Suits {} | not $ terminal a = True
@@ -75,6 +75,9 @@ terminal _                                   = False
 -- | Ends are the collection of Terminals and Honors.
 end a | terminal a || honor a   = True
       | otherwise               = False
+
+suit Suit {} = True
+suit _       = False
 
 --------------------------------------------------------------------------------
 characterSet, circleSet, bambooSet, windSet, dragonSet, fullSet :: [Tile]
