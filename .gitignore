@@ -1,11 +1,17 @@
-# Haskell
+dist
+cabal-dev
 *.o
 *.hi
-
-# Cabal
-.cabal*
-cabal*
-dist
-
-# FPComplete
-.project-settings.yml
+*.chi
+*.chs.h
+*.dyn_o
+*.dyn_hi
+.hpc
+.hsenv
+.cabal-sandbox/
+cabal.sandbox.config
+*.prof
+*.aux
+*.hp
+.stack-work/
+TAGS
