@@ -10,9 +10,9 @@ module Mahjong.Riichi.Base ( makeFields
                            , Turn (..)
                            ) where
 
-import Control.Lens (makeFields)
-import Mahjong.Meld
-import Mahjong.Tile
+import           Control.Lens (makeFields)
+import           Mahjong.Meld
+import           Mahjong.Tile
 
 type Tile = RawTile
 type Pile = [Tile]
