@@ -3,9 +3,9 @@ module Mahjong.Riichi.Base ( makeFields
                            , Pile
                            , Hand (..)
                            , drawTile
-                           , discardFromHand
-                           , tileToDiscard
                            , Player (..)
+                           , playerHandToTile
+                           , playerTileToDiscard
                            , Round (..)
                            , Turn (..)
                            ) where
@@ -33,14 +33,6 @@ drawTile :: Pile -> Hand -> (Pile, Hand)
 drawTile [] ys = ([], ys)
 drawTile (x:xs) (Hand ys) = (xs, Hand (x:ys))
 
--- Split this function into two parts, since a tile could be stolen.
--- discardTile :: Hand -> Pile -> Tile -> Either String (Hand, Pile)
--- discardTile xs@(Hand []) ys _ = Right (xs, ys) -- Not an actual thing that should ever happen
--- discardTile (Hand xs) ys t = let (rest, tile) = takeFrom xs t
---                              in maybe (Left "error: tile doesn't exist in player's hand!")
---                                 (\ jt -> Right (Hand rest, jt:ys))
---                                 tile
-
 -- Since a tile can be stolen we need to have a step between discardFromHand and
 -- tileToDiscard to see if the tile doesn't end up in some one else hand as a
 -- stolen tile.
@@ -64,12 +56,12 @@ data Player
   deriving (Show)
 makeFields ''Player
 
--- TODO: This could probably be a lot cleaner along with discardTile
--- playerDiscard :: Player -> Tile -> Either String Player
--- playerDiscard p = either Left
---                   (\ (newHand, newDiscard) ->
---                      Right (p { hand = newHand, discardPile = newDiscard }))
---                   . discardTile (hand p) (discardPile p)
+playerHandToTile :: Tile -> Player -> (Maybe Tile, Player)
+playerHandToTile t p = let (tile, ts) = discardFromHand t (hand p)
+                       in (tile, p { hand = ts })
+
+playerTileToDiscard :: Tile -> Player -> Player
+playerTileToDiscard t p = p { discardPile = tileToDiscard t (discardPile p) }
 
 data Round
   = EastRound
