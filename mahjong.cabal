@@ -15,6 +15,7 @@ library
                       Mahjong.Riichi
   other-modules:      Mahjong.Riichi.Base
                       Mahjong.Riichi.FourPlayer
+                      Mahjong.Riichi.Player
                       Mahjong.Riichi.ThreePlayer
 
   build-depends:      base >= 4.6  && < 5

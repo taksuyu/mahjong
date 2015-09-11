@@ -1,67 +1,52 @@
-module Mahjong.Riichi.Base ( makeFields
+module Mahjong.Riichi.Base ( makeLenses
                            , RawTile ()
                            , Pile
                            , Hand (..)
-                           , drawTile
                            , Player (..)
-                           , playerHandToTile
-                           , playerTileToDiscard
+                           , defaultPlayer
+                           , playerDrawTurn
+                           , playerDiscardTurn
                            , Round (..)
                            , Turn (..)
                            ) where
 
-import           Control.Lens (makeFields)
-import           Mahjong.Meld
+import           Control.Lens
+import           Data.List
+
+import           Mahjong.Riichi.Player
 import           Mahjong.Tile
 
-type Tile = RawTile
-type Pile = [Tile]
 
-newtype Hand
-  = Hand { unHand :: Pile }
-  deriving (Show)
+-- | We want to look through the list and remove the elem from that list; using
+-- Right signifies that the operation was successful and that we can continue on
+-- with the process.
+takeFrom :: (Eq a) => a -> [a] -> String -> Either String [a]
+takeFrom t ts message = let tz = delete t ts
+                         in if tz == ts
+                            then Right tz
+                            else Left message
 
-takeFrom :: (Eq a) => a -> [a] -> (Maybe a, [a])
-takeFrom _ []  = (Nothing, [])
-takeFrom a [x] | x == a    = (Just a, [])
-               | otherwise = (Nothing, [x])
-takeFrom a (x:xs) | x == a    = (Just a, xs)
-                  | otherwise = let (tile, rest) = takeFrom a xs
-                                in (tile, rest)
+-- | Because the structure that a player draws from is pure, we don't have to
+-- worry about side effects within the function. However, we do have to make
+-- sure that at the end of the player's turn if there is no more tiles that the
+-- game ends. Usually this means that the the hand (the current instance of the
+-- game being played) will end in a draw unless the current player wins, or a
+-- player wins off this player's discard.
+playerDrawTurn :: Tile -> Player -> Player
+playerDrawTurn t = hand . unHand %~ cons t
 
-drawTile :: Pile -> Hand -> (Pile, Hand)
-drawTile [] ys = ([], ys)
-drawTile (x:xs) (Hand ys) = (xs, Hand (x:ys))
-
--- Since a tile can be stolen we need to have a step between discardFromHand and
--- tileToDiscard to see if the tile doesn't end up in some one else hand as a
--- stolen tile.
-discardFromHand :: Tile -> Hand -> (Maybe Tile, Hand)
-discardFromHand t (Hand ts)= let (mt, h) = takeFrom t ts
-                             in (mt, Hand h)
-
--- As this function is, if t is at the front then the front is actually the last
--- tile in the pile. This could be counter intuitive in implementation because
--- the front is actually the back.
-tileToDiscard :: Tile -> Pile -> Pile
-tileToDiscard t p = t:p
-
-data Player
-  = Player
-    { score       :: Integer
-    , hand        :: Hand
-    , stolenMelds :: [Meld]
-    , discardPile :: Pile
-    }
-  deriving (Show)
-makeFields ''Player
-
-playerHandToTile :: Tile -> Player -> (Maybe Tile, Player)
-playerHandToTile t p = let (tile, ts) = discardFromHand t (hand p)
-                       in (tile, p { hand = ts })
-
-playerTileToDiscard :: Tile -> Player -> Player
-playerTileToDiscard t p = p { discardPile = tileToDiscard t (discardPile p) }
+-- | Discarding has a few side effects that we have to watch out for like if a
+-- player gives an invalid tile from the outside. To handle this we will return
+-- an Either that will throw an error that will be returned to the client so
+-- that they can pick a valid discard.
+playerDiscardTurn :: Tile -> Player -> Either String Player
+playerDiscardTurn t p = takeFrom t (_unHand . _hand $ p) "Tile wasn't in the Hand"
+                        & _Right -- If the tile existed it's now gone
+                        %~ (\ newHand ->
+                              p { _discardPile = t : _discardPile p
+                                , _hand = Hand newHand
+                                }
+                           )
 
 data Round
   = EastRound

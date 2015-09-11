@@ -14,4 +14,4 @@ data RiichiMahjong
     , bonus       :: Integer
     }
   deriving (Show)
-makeFields ''RiichiMahjong
+makeLenses ''RiichiMahjong
