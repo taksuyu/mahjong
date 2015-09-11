@@ -6,15 +6,17 @@ module Mahjong.Riichi.Base ( makeLenses
                            , defaultPlayer
                            , playerDrawTurn
                            , playerDiscardTurn
+                           , playerStealDiscard
                            , Round (..)
                            , Turn (..)
                            ) where
 
-import           Control.Lens
-import           Data.List
+import Control.Lens
+import Data.List (delete)
 
-import           Mahjong.Riichi.Player
-import           Mahjong.Tile
+import Mahjong.Riichi.Player
+import Mahjong.Meld
+import Mahjong.Tile
 
 
 -- | We want to look through the list and remove the elem from that list; using
@@ -41,12 +43,28 @@ playerDrawTurn t = hand . unHand %~ cons t
 -- that they can pick a valid discard.
 playerDiscardTurn :: Tile -> Player -> Either String Player
 playerDiscardTurn t p = takeFrom t (_unHand . _hand $ p) "Tile wasn't in the Hand"
-                        & _Right -- If the tile existed it's now gone
+                        & _Right
                         %~ (\ newHand ->
                               p { _discardPile = t : _discardPile p
                                 , _hand = Hand newHand
                                 }
                            )
+
+-- | When a player steals a tile it mutates both the original player and the
+-- player stealing the tile. Because stolen tiles must always be kept together
+-- with the tiles from the hand and can never be discarded they have to be kept
+-- separate. WARNING: This function assumes that the previous player not only
+-- discarded the tile, didn't win, but that the meld given to the function is
+-- correct for the stealing player.
+--
+-- FIXME: Make the function perfectly pure in the sense that it cannot create an
+-- unexpected board state.
+playerStealDiscard :: Player -> Player -> Meld -> (Player, Player)
+playerStealDiscard p1 p2 m = ( p1 & discardPile .~ maybe [] snd tupledStolen
+                             , p2 & stolenMelds %~ cons m
+                             )
+  where
+    tupledStolen = p1 ^. discardPile & uncons
 
 data Round
   = EastRound
