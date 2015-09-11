@@ -1,17 +1,19 @@
 module Mahjong.Riichi.FourPlayer where
 
+-- | This module contains the four player riichi variant of mahjong.
+
 import Mahjong.Riichi.Base
 
 data RiichiMahjong
   = RiichiMahjong
-    { playerEast  :: Player
-    , playerSouth :: Player
-    , playerWest  :: Player
-    , playerNorth :: Player
-    , wall        :: Pile
-    , round       :: Round
-    , hand        :: Turn
-    , bonus       :: Integer
+    { _playerEast  :: Player
+    , _playerSouth :: Player
+    , _playerWest  :: Player
+    , _playerNorth :: Player
+    , _wall        :: Pile
+    , _round       :: Round
+    , _hand        :: Turn
+    , _bonus       :: Integer
     }
   deriving (Show)
 makeLenses ''RiichiMahjong
