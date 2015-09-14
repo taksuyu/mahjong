@@ -4,8 +4,8 @@ module Mahjong.Riichi.Base ( makeLenses
                            , Hand (..)
                            , Player (..)
                            , defaultPlayer
-                           , playerDrawTurn
-                           , playerDiscardTurn
+                           , playerDraw
+                           , playerDiscard
                            , playerStealDiscard
                            , Round (..)
                            , Turn (..)
@@ -34,21 +34,21 @@ takeFrom t ts message = let tz = delete t ts
 -- game ends. Usually this means that the the hand (the current instance of the
 -- game being played) will end in a draw unless the current player wins, or a
 -- player wins off this player's discard.
-playerDrawTurn :: Tile -> Player -> Player
-playerDrawTurn t = hand . unHand %~ cons t
+playerDraw :: Tile -> Player -> Player
+playerDraw t = hand . unHand %~ cons t
 
 -- | Discarding has a few side effects that we have to watch out for like if a
 -- player gives an invalid tile from the outside. To handle this we will return
 -- an Either that will throw an error that will be returned to the client so
 -- that they can pick a valid discard.
-playerDiscardTurn :: Tile -> Player -> Either String Player
-playerDiscardTurn t p = takeFrom t (_unHand . _hand $ p) "Tile wasn't in the Hand"
-                        & _Right
-                        %~ (\ newHand ->
-                              p { _discardPile = t : _discardPile p
-                                , _hand = Hand newHand
-                                }
-                           )
+playerDiscard :: Tile -> Player -> Either String Player
+playerDiscard t p = takeFrom t (_unHand . _hand $ p) "Tile wasn't in the Hand"
+                    & _Right
+                    %~ (\ newHand ->
+                          p { _discardPile = t : _discardPile p
+                            , _hand = Hand newHand
+                            }
+                       )
 
 -- | When a player steals a tile it mutates both the original player and the
 -- player stealing the tile. Because stolen tiles must always be kept together
