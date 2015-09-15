@@ -16,7 +16,9 @@ library
   other-modules:      Mahjong.Riichi.Base
                       Mahjong.Riichi.FourPlayer
                       Mahjong.Riichi.Player
+                      Mahjong.Riichi.Round
                       Mahjong.Riichi.ThreePlayer
+                      Mahjong.Riichi.Turn
 
   build-depends:      base >= 4.6  && < 5
                     , lens >= 4.12 && < 4.13

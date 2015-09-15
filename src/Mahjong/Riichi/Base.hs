@@ -15,6 +15,8 @@ import Control.Lens
 import Data.List (delete)
 
 import Mahjong.Riichi.Player
+import Mahjong.Riichi.Round
+import Mahjong.Riichi.Turn
 import Mahjong.Meld
 import Mahjong.Tile
 
@@ -65,17 +67,3 @@ playerStealDiscard p1 p2 m = ( p1 & discardPile .~ maybe [] snd tupledStolen
                              )
   where
     tupledStolen = p1 ^. discardPile & uncons
-
-data Round
-  = EastRound
-  | SouthRound
-  | WestRound
-  | NorthRound
-  deriving (Eq, Ord, Enum, Bounded, Show)
-
-data Turn
-  = EastTurn
-  | SouthTurn
-  | WestTurn
-  | NorthTurn
-  deriving (Eq, Ord, Enum, Bounded, Show)
