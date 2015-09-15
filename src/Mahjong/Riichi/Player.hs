@@ -10,7 +10,6 @@ import Control.Lens
 import Mahjong.Meld
 import Mahjong.Tile
 
-type Tile = RawTile
 type Pile = [Tile]
 
 newtype Hand
