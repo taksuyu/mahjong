@@ -1,5 +1,5 @@
 module Mahjong.Riichi.Base ( makeLenses
-                           , RawTile ()
+                           , Tile (..)
                            , Pile
                            , Hand (..)
                            , Player (..)

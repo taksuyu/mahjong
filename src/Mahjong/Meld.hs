@@ -3,17 +3,18 @@ module Mahjong.Meld
        , StolenTile (..)
        ) where
 
+import Mahjong.Seat
 import Mahjong.Tile
 
 data StolenTile
-  = STile RawTile Int
+  = STile Tile Seat
   deriving (Show)
 
 data Meld
-  = Run RawTile RawTile RawTile
-  | SRun StolenTile RawTile RawTile
-  | Set RawTile
+  = Run Tile Tile Tile
+  | SRun StolenTile Tile Tile
+  | Set Tile
   | SSet StolenTile
-  | Quad RawTile
+  | Quad Tile
   | SQuad StolenTile
   deriving (Show)
