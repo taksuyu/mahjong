@@ -57,7 +57,8 @@ prev' :: (Eq a, Enum a, Bounded a) => a -> a
 prev' a | a == minBound = maxBound
         | otherwise = pred a
 
--- | TNum represents the values with simple tiles like Character, Circle, and Bamboo.
+-- | TNum represents the values with simple tiles like Character, Circle, and
+-- Bamboo.
 data TNum
   = One
   | Two
@@ -74,7 +75,8 @@ instance Cycle TNum where
   next = next'
   prev = prev'
 
--- | Wind represent the cardinal directions that can be found on Wind tiles, and their inherent ordering.
+-- | Wind represent the cardinal directions that can be found on Wind tiles, and
+-- their inherent ordering.
 data Wind
   = East
   | South
@@ -86,7 +88,8 @@ instance Cycle Wind where
   next = next'
   prev = prev'
 
--- | Dragon represent the colors that can be found on Dragon tiles, and their inherent ordering.
+-- | Dragon represent the colors that can be found on Dragon tiles, and their
+-- inherent ordering.
 data Dragon
   = Red
   | White
@@ -114,9 +117,9 @@ data Tile
   deriving (Eq, Show)
 
 instance Tileable Tile where
-  honor (Wind _)        = True
-  honor (Dragon _)      = True
-  honor _               = False
+  honor (Wind _)   = True
+  honor (Dragon _) = True
+  honor _          = False
 
   terminal (Character ct)  = isBounds ct
   terminal (Circle ct)     = isBounds ct
