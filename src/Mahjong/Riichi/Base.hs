@@ -11,24 +11,25 @@ module Mahjong.Riichi.Base ( makeLenses
                            , Turn (..)
                            ) where
 
-import Control.Lens
-import Data.List (delete)
+import           Control.Lens
+import           Data.List             (delete)
 
-import Mahjong.Riichi.Player
-import Mahjong.Riichi.Round
-import Mahjong.Riichi.Turn
-import Mahjong.Meld
-import Mahjong.Tile
+import           Mahjong.Meld
+import           Mahjong.Riichi.Player
+import           Mahjong.Riichi.Round
+import           Mahjong.Riichi.Turn
+import           Mahjong.Tile
 
 
 -- | We want to look through the list and remove the elem from that list; using
 -- Right signifies that the operation was successful and that we can continue on
 -- with the process.
 takeFrom :: (Eq a) => a -> [a] -> String -> Either String [a]
-takeFrom t ts message = let tz = delete t ts
-                         in if tz == ts
-                            then Right tz
-                            else Left message
+takeFrom t ts message = if tz == ts
+                        then Right tz
+                        else Left message
+  where
+    tz = delete t ts
 
 -- | Because the structure that a player draws from is pure, we don't have to
 -- worry about side effects within the function. However, we do have to make
@@ -67,3 +68,4 @@ playerStealDiscard p1 p2 m = ( p1 & discardPile .~ maybe [] snd tupledStolen
                              )
   where
     tupledStolen = p1 ^. discardPile & uncons
+
