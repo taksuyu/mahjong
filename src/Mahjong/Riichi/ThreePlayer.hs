@@ -1,6 +1,8 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Mahjong.Riichi.ThreePlayer where
 
-import Mahjong.Riichi.Base
+import           Mahjong.Riichi.Base
 
 data RiichiMahjong
   = RiichiMahjong

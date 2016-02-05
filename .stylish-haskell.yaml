@@ -31,7 +31,7 @@ steps:
       # - none: Do not perform any alignment.
       #
       # Default: global.
-      align: global
+      align: file
 
   # Language pragmas
   - language_pragmas:
@@ -45,7 +45,7 @@ steps:
       #   `{-#LANGUAGE #-}'.
       #
       # Default: vertical.
-      style: vertical
+      style: compact
 
       # stylish-haskell can detect redundancy of some language pragmas. If this
       # is set to true, it will remove those redundant pragmas. Default: true.
@@ -73,5 +73,5 @@ columns: 80
 #
 # No language extensions are enabled by default.
 language_extensions:
+  - DefaultSignatures
   - TemplateHaskell
-  # - QuasiQuotes

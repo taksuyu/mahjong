@@ -1,8 +1,8 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Mahjong.Riichi.FourPlayer where
 
--- | This module contains the four player riichi variant of mahjong.
-
-import Mahjong.Riichi.Base
+import           Mahjong.Riichi.Base
 
 data FourPlayer
   = FourPlayer
@@ -17,6 +17,14 @@ data FourPlayer
     }
   deriving (Show)
 makeLenses ''FourPlayer
+
+defaultFourPlayer :: FourPlayer
+defaultFourPlayer = FourPlayer
+                    defaultPlayer defaultPlayer defaultPlayer defaultPlayer
+                    []
+                    EastRound
+                    EastTurn
+                    0
 
 data FourPlayerOptions
   = FourPlayerOptions
@@ -39,4 +47,8 @@ data RenhouOption
   | RenhouYaku Int -- ^ The yaku value is cumulative and is generally set to 5
                    -- for the hand to be at least a mangan.
   | Nashi
+  deriving (Eq, Show)
+
+data MahjongError
+  = AbandonedGame
   deriving (Eq, Show)
