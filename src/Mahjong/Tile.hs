@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving #-}
 
 module Mahjong.Tile
        ( -- * Typeclasses
@@ -6,8 +6,6 @@ module Mahjong.Tile
        , isBounds
        , Cycle (..)
          -- * Types
-       , Tile (..)
-       , sameSuit
          -- ** Suits
        , TNum (..)
        , Character (..)
@@ -34,9 +32,8 @@ class Tileable a where
   simple :: a -> Bool
   simple = not . terminal
 
+  -- | Has a default instance uses `isBounds`, can be satisfied with just a -> Bool.
   terminal :: a -> Bool
-
-  -- If Eq and Bounded are available this is the most common implementation.
   default terminal :: (Eq a, Bounded a) => a -> Bool
   terminal a | suit a = isBounds a
              | otherwise = False
@@ -44,8 +41,6 @@ class Tileable a where
   end :: a -> Bool
   end a | honor a || terminal a = True
         | otherwise = False
-
-  toTile :: a -> Tile
 
 -- | Simple function to test if something is at either bound of a Bounded
 -- object. Useful when implementing terminal.
@@ -94,47 +89,20 @@ data TNum
 
 instance Cycle TNum
 
-data Character
-  = Character' TNum
-  deriving (Eq, Show)
-
-instance Ord Character where
-  compare (Character' t) (Character' t') = compare t t'
-
-instance Tileable Character where
+instance Tileable TNum where
   honor _ = False
 
-  terminal (Character' t) = isBounds t
+newtype Character
+  = Character TNum
+  deriving (Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
 
-  toTile (Character' t) = Character t
+newtype Circle
+  = Circle TNum
+  deriving (Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
 
-data Circle
-  = Circle' TNum
-  deriving (Eq, Show)
-
-instance Ord Circle where
-  compare (Circle' t) (Circle' t') = compare t t'
-
-instance Tileable Circle where
-  honor _ = False
-
-  terminal (Circle' t) = isBounds t
-
-  toTile (Circle' t) = Circle t
-
-data Bamboo
-  = Bamboo' TNum
-  deriving (Eq, Show)
-
-instance Ord Bamboo where
-  compare (Bamboo' t) (Bamboo' t') = compare t t'
-
-instance Tileable Bamboo where
-  honor _ = False
-
-  terminal (Bamboo' t)= isBounds t
-
-  toTile (Bamboo' t) = Bamboo t
+newtype Bamboo
+  = Bamboo TNum
+  deriving (Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
 
 -- | Wind represent the cardinal directions that can be found on Wind tiles, and
 -- their inherent ordering.
@@ -150,8 +118,6 @@ instance Cycle Wind
 instance Tileable Wind where
   honor _ = True
 
-  toTile = Wind
-
 -- | Dragon represent the colors that can be found on Dragon tiles, and their
 -- inherent ordering.
 data Dragon
@@ -164,8 +130,6 @@ instance Cycle Dragon
 
 instance Tileable Dragon where
   honor _ = True
-
-  toTile = Dragon
 
 data Flower
   = Plum
@@ -200,73 +164,3 @@ isAnimalPair :: Animal -> Animal -> Bool
 isAnimalPair at1 at2 = setNumber at1 == setNumber at2
   where
     setNumber at = div (fromEnum at) 2
-
-data Tile
-    -- Simple tiles
-  = Character TNum
-  | Circle TNum
-  | Bamboo TNum
-
-    -- Honor tiles
-  | Wind Wind
-  | Dragon Dragon
-
-    -- Special tiles
-  | Flower Flower
-  | Season Season
-  | Animal Animal
-  | Joker
-    -- ^ Used in some variants of Mahjong as a replacement for any other tile.
-  deriving (Eq, Show)
-
--- | Only have assumed knowledge of riichi mahjong, other variants may have
--- values that aren't present.
-instance Tileable Tile where
-  honor (Wind _) = True
-  honor (Dragon _) = True
-  honor _ = False
-
-  terminal (Character t) = isBounds t
-  terminal (Circle t) = isBounds t
-  terminal (Bamboo t) = isBounds t
-  terminal (Wind _) = True
-  terminal (Dragon _) = True
-  terminal _ = False
-
-  toTile = id
-
--- TODO: Should look for a way to break down this boilerplate
-instance Cycle Tile where
-  next (Character t) = Character (next t)
-  next (Circle t) = Circle (next t)
-  next (Bamboo t) = Bamboo (next t)
-  next (Wind w) = Wind (next w)
-  next (Dragon d) = Dragon (next d)
-  next (Flower f) = Flower (next f)
-  next (Season s) = Season (next s)
-  next (Animal a) = Animal (next a)
-  next (Joker) = Joker
-
-  prev (Character t) = Character (prev t)
-  prev (Circle t) = Circle (prev t)
-  prev (Bamboo t) = Bamboo (prev t)
-  prev (Wind w) = Wind (prev w)
-  prev (Dragon d) = Dragon (prev d)
-  prev (Flower f) = Flower (prev f)
-  prev (Season s) = Season (prev s)
-  prev (Animal a) = Animal (prev a)
-  prev (Joker) = Joker
-
--- TODO: Possibly make a Suited typeclass that compares constructors, generics
--- would more than likely accomplish this automatically.
-sameSuit :: Tile -> Tile -> Bool
-sameSuit (Character _) (Character _) = True
-sameSuit (Circle _) (Circle _) = True
-sameSuit (Bamboo _) (Bamboo _) = True
-sameSuit (Wind _) (Wind _) = True
-sameSuit (Dragon _) (Dragon _) = True
-sameSuit (Flower _) (Flower _) = True
-sameSuit (Season _) (Season _) = True
-sameSuit (Animal _) (Animal _) = True
-sameSuit Joker Joker = True
-sameSuit _ _ = False

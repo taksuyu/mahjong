@@ -11,14 +11,16 @@ module Mahjong.Riichi.Base ( makeLenses
                            , Turn (..)
                            ) where
 
-import           Control.Lens
-import           Data.List             (delete)
+import Control.Lens
+import Data.List             (delete)
 
-import           Mahjong.Meld
-import           Mahjong.Riichi.Player
-import           Mahjong.Riichi.Round
-import           Mahjong.Riichi.Turn
-import           Mahjong.Tile
+import Mahjong.Dora
+import Mahjong.Meld
+
+import Mahjong.Riichi.Player
+import Mahjong.Riichi.Round
+import Mahjong.Riichi.Tile
+import Mahjong.Riichi.Turn
 
 
 -- | We want to look through the list and remove the elem from that list; using
@@ -62,7 +64,7 @@ playerDiscard t p = takeFrom t (_unPlayerHand . _hand $ p) "Tile wasn't in the H
 --
 -- FIXME: Make the function perfectly pure in the sense that it cannot create an
 -- unexpected board state.
-playerStealDiscard :: Player -> Player -> Meld -> (Player, Player)
+playerStealDiscard :: Player -> Player -> Meld (Dora Tile) -> (Player, Player)
 playerStealDiscard p1 p2 m = ( p1 & discardPile .~ maybe [] snd tupledStolen
                              , p2 & stolenMelds %~ cons m
                              )

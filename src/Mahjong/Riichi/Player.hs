@@ -2,10 +2,12 @@
 
 module Mahjong.Riichi.Player where
 
-import           Control.Lens
+import Control.Lens
 
-import           Mahjong.Meld
-import           Mahjong.Tile
+import Mahjong.Dora
+import Mahjong.Meld
+
+import Mahjong.Riichi.Tile
 
 type Pile = [Tile]
 
@@ -18,7 +20,7 @@ data Player
   = Player
     { _score       :: Integer
     , _hand        :: PlayerHand
-    , _stolenMelds :: [Meld]
+    , _stolenMelds :: [Meld (Dora Tile)]
     , _discardPile :: Pile
     , _inRiichi    :: Bool
     , _inFuriten   :: Bool
