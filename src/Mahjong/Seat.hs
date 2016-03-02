@@ -1,8 +1,12 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Mahjong.Seat where
+
+import GHC.Generics
 
 data Seat
   = EastSeat
   | SouthSeat
   | WestSeat
   | NorthSeat
-  deriving (Eq, Ord, Enum, Bounded, Show)
+  deriving (Generic, Eq, Ord, Enum, Bounded, Show)

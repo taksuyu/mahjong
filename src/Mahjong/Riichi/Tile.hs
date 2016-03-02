@@ -1,4 +1,8 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Mahjong.Riichi.Tile where
+
+import GHC.Generics
 
 import Mahjong.Tile
 
@@ -8,7 +12,7 @@ data Tile
   | BambooT Bamboo
   | WindT Wind
   | DragonT Dragon
-  deriving (Eq, Show)
+  deriving (Generic, Eq, Show)
 
 -- We could just pass the function down the chain since all the types implement
 -- this class, but it's the same amount of code to just implement it here at
@@ -40,3 +44,11 @@ instance Cycle Tile where
     BambooT b -> BambooT (prev b)
     WindT w -> WindT (prev w)
     DragonT d -> DragonT (prev d)
+
+sameSuit :: Tile -> Tile -> Bool
+sameSuit (CharacterT _) (CharacterT _) = True
+sameSuit (CircleT _) (CircleT _) = True
+sameSuit (BambooT _) (BambooT _) = True
+sameSuit (WindT _) (WindT _) = True
+sameSuit (DragonT _) (DragonT _) = True
+sameSuit _ _ = False

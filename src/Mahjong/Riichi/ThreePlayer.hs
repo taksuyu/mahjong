@@ -2,7 +2,9 @@
 
 module Mahjong.Riichi.ThreePlayer where
 
-import           Mahjong.Riichi.Base
+import Control.Lens
+
+import Mahjong.Riichi
 
 data RiichiMahjong
   = RiichiMahjong

@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DefaultSignatures, DeriveGeneric, GeneralizedNewtypeDeriving #-}
 
 module Mahjong.Tile
        ( -- * Typeclasses
@@ -20,6 +20,8 @@ module Mahjong.Tile
        , Animal (..)
        , isAnimalPair
        ) where
+
+import GHC.Generics
 
 -- | Basic functions of a Tile.
 class Tileable a where
@@ -85,7 +87,7 @@ data TNum
   | Seven
   | Eight
   | Nine
-  deriving (Eq, Ord, Bounded, Enum, Show)
+  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
 
 instance Cycle TNum
 
@@ -94,15 +96,15 @@ instance Tileable TNum where
 
 newtype Character
   = Character TNum
-  deriving (Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
+  deriving (Generic, Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
 
 newtype Circle
   = Circle TNum
-  deriving (Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
+  deriving (Generic, Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
 
 newtype Bamboo
   = Bamboo TNum
-  deriving (Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
+  deriving (Generic, Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
 
 -- | Wind represent the cardinal directions that can be found on Wind tiles, and
 -- their inherent ordering.
@@ -111,7 +113,7 @@ data Wind
   | South
   | West
   | North
-  deriving (Eq, Ord, Bounded, Enum, Show)
+  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
 
 instance Cycle Wind
 
@@ -124,7 +126,7 @@ data Dragon
   = Red
   | White
   | Green
-  deriving (Eq, Ord, Bounded, Enum, Show)
+  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
 
 instance Cycle Dragon
 
@@ -136,7 +138,7 @@ data Flower
   | Orchid
   | Chrysanthemum
   | BambooFlower
-  deriving (Eq, Ord, Bounded, Enum, Show)
+  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
 
 instance Cycle Flower
 
@@ -145,7 +147,7 @@ data Season
   | Summer
   | Autumn
   | Winter
-  deriving (Eq, Ord, Bounded, Enum, Show)
+  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
 
 instance Cycle Season
 
@@ -155,7 +157,7 @@ data Animal
   | Rooster   | Centipede
   | RichMan   | PotOfGold
   | Fisherman | Fish
-  deriving (Eq, Ord, Bounded, Enum, Show)
+  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
 
 instance Cycle Animal
 

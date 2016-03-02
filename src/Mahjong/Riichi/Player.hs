@@ -9,7 +9,7 @@ import Mahjong.Meld
 
 import Mahjong.Riichi.Tile
 
-type Pile = [Tile]
+type Pile = [Dora Tile]
 
 newtype PlayerHand
   = PlayerHand { _unPlayerHand :: Pile }
