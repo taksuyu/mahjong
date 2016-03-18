@@ -3,6 +3,7 @@
 
 module Tests.Mahjong.Meld where
 
+import Data.List
 import Test.SmallCheck.Series
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -42,5 +43,5 @@ unitMahjongMeld = testGroup "Mahjong.Meld"
 
 testRunMelds :: TestTree
 testRunMelds = testCase "runMelds sorts and pairs Runs"
-               ( runMelds [One, Three, Two, Five, Four, Nine] @?=
-                 [Run One Two Three,Run Two Three Four,Run Three Four Five] )
+               ( runMelds [One, Three, Two, Five, Four, Nine] \\
+                 [Run One Two Three,Run Two Three Four,Run Three Four Five] @?= [] )
