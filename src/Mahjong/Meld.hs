@@ -1,6 +1,9 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE CPP, DeriveGeneric #-}
 
 module Mahjong.Meld where
+
+-- 7.8.4 support
+import           Data.Monoid
 
 import           Data.List
 import           Data.Set     (Set)

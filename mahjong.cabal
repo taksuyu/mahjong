@@ -31,10 +31,10 @@ library
                , containers
 
                , either
-                 >= 4.4.1 && < 4.4.2
+                 >= 4.3.4 && < 4.4.2
 
                , lens
-                 >= 4.12 && < 4.14
+                 >= 4.7 && < 4.14
 
   hs-source-dirs: src
   default-language: Haskell2010
@@ -50,6 +50,7 @@ test-suite mahjong-test
 
   build-depends: base
                , mahjong
+               , containers
                , smallcheck
                  >= 1.1.1 && <= 1.2
 
