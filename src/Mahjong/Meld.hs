@@ -3,6 +3,7 @@
 module Mahjong.Meld where
 
 import           Data.List
+import           Data.Set     (Set)
 import qualified Data.Set     as S
 import           GHC.Generics
 
@@ -19,7 +20,7 @@ data Meld a
     -- honor.
   | Set a
   | Quad a
-  deriving (Generic, Eq, Show)
+  deriving (Generic, Eq, Ord, Show)
 
 instance Functor Meld where
   fmap fn (Run a b c) = Run (fn a) (fn b) (fn c)
@@ -72,7 +73,7 @@ data Wait a
     -- ^ A single tile can be a wait for a Pair or part of hands like kokushi
     -- musou (Thirteen Orphans: Each terminal and honor, and a single pair of
     -- any other tile in the hand).
-  deriving (Generic, Show)
+  deriving (Generic, Eq, Ord, Show)
 
 -- | Pairs are used specifically in hands so we'll create a newtype to deal with
 -- them directly rather than Waits.
@@ -84,44 +85,66 @@ mkPair :: Wait a -> Maybe (Pair a)
 mkPair a@(WPair _) = Just (Pair a)
 mkPair _ = Nothing
 
-runWaits :: [TNum] -> [Wait TNum]
+runWaits :: [TNum] -> Set (Wait TNum)
 runWaits h = let set = S.fromList h
              in S.foldl (findWaits set) mempty set
   where
-    findWaits set l t = 
+    findWaits set s t = foldl (\ a -> maybe a (`S.insert` a)) s [seqWRun set t, off1WRun set t]
 
-runMelds :: [TNum] -> [Meld TNum]
+    -- Matches 1 & 2, 2 & 3, etc.
+    seqWRun set t | t /= maxBound && S.member (succ t) set
+                    = Just (WRun t (succ t))
+                  | otherwise = Nothing
+
+    -- Matches 1 & 3, 2 & 4, etc.
+    off1WRun set t | t /= maxBound && succ t /= maxBound && S.member (succ (succ t)) set
+                     = Just (WRun t (succ (succ t)))
+                   | otherwise = Nothing
+
+runMelds :: [TNum] -> Set (Meld TNum)
 runMelds h = let set = S.fromList h
              in S.foldl (createRuns set) mempty set
   where
-    createRuns set l t
-      | t /= maxBound && S.member (s t) set
-      , s t /= maxBound && S.member (ss t) set
-        = Run t (s t) (ss t) : l
-      | otherwise = l
-    s = succ
-    ss = s . s
+    createRuns set s t
+      | t /= maxBound && S.member (succ t) set
+      , succ t /= maxBound && S.member (succ $ succ t) set
+        = S.insert (Run t (succ t) (succ $ succ t)) s
+      | otherwise = s
 
-expandList :: (Ord a) => ([b] -> a -> [b]) -> [a] -> [b]
-expandList fn a = S.foldl fn mempty (S.fromList a)
+-- | Using a Set to cut down on computation space and a function to expand our
+-- options we can generate a Monoid that represents the whole option space (we
+-- use this to generate a Set).
+expand :: (Monoid a, Ord b) => (a -> b -> a) -> [b] -> a
+expand fn a = S.foldl fn mempty (S.fromList a)
 
 -- | Higher ordered function to expand matching Pairs, Sets, and Quads.
-matchInList :: Eq a => [a] -> Int -> (a -> b) -> [b] -> a -> [b]
-matchInList l n con a b
-  | length (elemIndices b l) >= n = con b : a
+matchInList :: (Eq a, Ord b)
+            => [a]
+            -- ^ Original list of elements (l)
+            -> Int
+            -- ^ Minimal list of elements we want to match (n)
+            -> (a -> b)
+            -- ^ Constructor to apply (fn)
+            -> Set b
+            -- ^ Set of previous matched elements in the fold (a)
+            -> a
+            -- ^ Single element to match in our original list of elements (s)
+            -> Set b
+matchInList l n fn a s
+  | length (elemIndices s l) >= n = S.insert (fn s) a
   | otherwise = a
 
-singleWaits :: (Eq a, Ord a) => [a] -> [Wait a]
-singleWaits h = expandList (matchInList h 1 WSingle) h
+singleWaits :: (Eq a, Ord a) => [a] -> Set (Wait a)
+singleWaits h = expand (matchInList h 1 WSingle) h
 
-pairWaits :: (Eq a, Ord a) => [a] -> [Wait a]
-pairWaits h = expandList (matchInList h 2 WPair) h
+pairWaits :: (Eq a, Ord a) => [a] -> Set (Wait a)
+pairWaits h = expand (matchInList h 2 WPair) h
 
 -- | Sets work for every suit so we can just replace the suit type with a
-setMelds :: (Eq a, Ord a) => [a] -> [Meld a]
-setMelds h = expandList (matchInList h 3 Set) h
+setMelds :: (Eq a, Ord a) => [a] -> Set (Meld a)
+setMelds h = expand (matchInList h 3 Set) h
 
 -- | Checks if the list of tiles has exactly 4 instances of the element in the
 -- list. Mahjong only plays with a maximum of four per tile.
-quadMelds :: (Eq a, Ord a) => [a] -> [Meld a]
-quadMelds h = expandList (matchInList h 4 Quad) h
+quadMelds :: (Eq a, Ord a) => [a] -> Set (Meld a)
+quadMelds h = expand (matchInList h 4 Quad) h
