@@ -1,48 +1,29 @@
-module Mahjong.Shanten
-       ( Shanten (..)
-       , Pair (..)
-       , End (unEnd)
-       , mkEnd
-       , EndPair (unEndPair)
-       , mkEndPair
-       ) where
+module Mahjong.Shanten where
 
-import           Mahjong.Meld
-import           Mahjong.Tile
-
--- | Shanten is a way of figuring out how many tiles you need tell you
--- have a hand that is ready. While traditionally this is a number,
--- the structure allows us to buildup a hand in a free form way; this
--- could have a many advantages to this solving space because we can
--- track what parts of the hand are effected with every draw and
--- discard in a build up and break down fashion.
-data Shanten
-  = Hand Meld Meld Meld Meld Pair
-  | Chii Pair Pair Pair Pair Pair Pair Pair
-  | TOrph End End End End End End End End End End End End EndPair
-  deriving (Show)
-
-data Pair
-  = Pair RawTile
-  deriving (Eq, Show)
-
-newtype End
-  = End { unEnd :: RawTile }
-  deriving (Eq, Show)
-
-mkEnd :: RawTile -> Maybe End
-mkEnd = justify End end
-
-newtype EndPair
-  = EndPair { unEndPair :: RawTile }
-  deriving (Eq, Show)
-
-mkEndPair :: RawTile -> Maybe EndPair
-mkEndPair = justify EndPair end
-
--- Formal definition of a package I made, will replace it in a later date if it
--- shows up more in my code.
-justify :: (a -> b) -> (a -> Bool) -> a -> Maybe b
-justify fn check a = if check a
-                     then Just (fn a)
-                     else Nothing
+data ShantenCount
+  = Win
+    -- ^ -1 tiles from Tenpai or a winning hand. Note that Riichi has additional
+    -- rules to winning a hand than just collecting the necessary tiles for the
+    -- hand such as Furiten (Sacred Discard) in which you cannot have discarded
+    -- one of the tiles you are waiting for from Tenpai and call Ron (Winning
+    -- off another players discard).
+  | Tenpai
+    -- ^ The state of Tenpai is being one tile away from a winning hand. If the
+    -- hand is closed (hasn't stolen a tile from another player) then the player
+    -- may call Riichi by betting 1000 points and having their tile being
+    -- discarded without having another player call Ron.
+  | OneFrom
+  | TwoFrom
+  | ThreeFrom
+  | FourFrom
+  | FiveFrom
+  | SixFrom
+    -- ^ The highest possible value for shanten. If you were to have the worst
+    -- possible hand of 14 tiles that have no iteraction with each other, then
+    -- you'd still be only seven tiles away from the winning hand Chiitoitsu
+    -- (Seven Pairs) which would require you to collect six paired tiles to put
+    -- you into Tenpai and then one more to have a winning hand. If a player
+    -- starts out being six tiles from Tenpai then they may call a null round,
+    -- show that they are six tiles from Tenpai, add a counter to the bonus
+    -- round, and restartthe game.
+  deriving (Eq, Enum, Bounded)
