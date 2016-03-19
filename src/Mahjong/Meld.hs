@@ -2,8 +2,9 @@
 
 module Mahjong.Meld where
 
--- 7.8.4 support
+#if (! MIN_VERSION_base(4,8,0))
 import           Data.Monoid
+#endif
 
 import           Data.List
 import           Data.Set     (Set)

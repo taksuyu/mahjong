@@ -1,8 +1,6 @@
 module Mahjong.Riichi
-       ( -- * Tile
-         Tile (..)
-         -- * Player
-       , Pile
+       ( -- * Player
+         Pile
        , PlayerHand (..)
        , Player (..)
        , defaultPlayer
@@ -12,6 +10,8 @@ module Mahjong.Riichi
          -- * Rounds and Turns
        , Round (..)
        , Turn (..)
+         -- * Modules
+       , module T
        ) where
 
 import Control.Lens
@@ -19,10 +19,10 @@ import Data.List             (delete)
 
 import Mahjong.Dora
 import Mahjong.Meld
+import Mahjong.Tile.Riichi   as T
 
 import Mahjong.Riichi.Player
 import Mahjong.Riichi.Round
-import Mahjong.Riichi.Tile
 import Mahjong.Riichi.Turn
 
 

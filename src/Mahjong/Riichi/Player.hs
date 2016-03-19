@@ -6,8 +6,7 @@ import Control.Lens
 
 import Mahjong.Dora
 import Mahjong.Meld
-
-import Mahjong.Riichi.Tile
+import Mahjong.Tile.Riichi
 
 type Pile = [Dora Tile]
 

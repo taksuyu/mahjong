@@ -15,6 +15,7 @@ library
                  , Mahjong.Riichi
                  , Mahjong.Seat
                  , Mahjong.Tile
+                 , Mahjong.Tile.Riichi
 
   other-modules: Mahjong.Riichi.FourPlayer
                , Mahjong.Riichi.Hand
@@ -22,16 +23,12 @@ library
                , Mahjong.Riichi.Round
                , Mahjong.Riichi.Shanten
                , Mahjong.Riichi.ThreePlayer
-               , Mahjong.Riichi.Tile
                , Mahjong.Riichi.Turn
 
   build-depends: base
                  >= 4.6 && < 5
 
                , containers
-
-               , either
-                 >= 4.3.4 && < 4.4.2
 
                , lens
                  >= 4.7 && < 4.14

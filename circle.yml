@@ -1,7 +1,7 @@
 machine:
   ghc:
     version: 7.8.4
-    
+
 dependencies:
   pre:
     - wget https://www.stackage.org/lts-2/cabal.config

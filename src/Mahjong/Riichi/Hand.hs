@@ -6,9 +6,7 @@ import Control.Lens
 import Data.Monoid
 
 import Mahjong.Dora
-import Mahjong.Tile
-
-import Mahjong.Riichi.Tile
+import Mahjong.Tile.Riichi
 
 -- | Hand representation for riichi mahjong for easy parsing of tiles.
 data Hand
