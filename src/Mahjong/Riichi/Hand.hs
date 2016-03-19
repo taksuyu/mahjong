@@ -39,11 +39,10 @@ toHand :: [Dora Tile] -> Hand
 toHand = foldr addTile mempty
 
 fromHand :: Hand -> [Dora Tile]
-fromHand h = suits CharacterT characters <>
-             suits CircleT circles <>
-             suits BambooT bamboo <>
-             honors WindT winds <>
-             honors DragonT dragons
+fromHand h = tileHelper CharacterT characters <>
+             tileHelper CircleT circles <>
+             tileHelper BambooT bamboo <>
+             tileHelper WindT winds <>
+             tileHelper DragonT dragons
   where
-    suits con len = fmap (fmap con) $ h ^. len
-    honors con len = fmap (fmap con) $ h ^. len
+    tileHelper con len = fmap (fmap con) $ h ^. len
