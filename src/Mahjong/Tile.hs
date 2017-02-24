@@ -1,31 +1,16 @@
-{-# LANGUAGE DefaultSignatures, DeriveGeneric, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DefaultSignatures, DeriveDataTypeable, DeriveFoldable,
+             DeriveFunctor, DeriveTraversable, GeneralizedNewtypeDeriving,
+             LambdaCase, MultiParamTypeClasses #-}
 
-module Mahjong.Tile
-       ( -- * Typeclasses
-         Tileable (..)
-       , isBounds
-       , Cycle (..)
-         -- * Types
-         -- ** Suits
-       , TNum (..)
-       , Character (..)
-       , Circle (..)
-       , Bamboo (..)
-         -- ** Honors
-       , Wind (..)
-       , Dragon (..)
-         -- ** Special
-       , Flower (..)
-       , Season (..)
-       , Animal (..)
-       , isAnimalPair
-       ) where
+-- | Stability: Stable
+module Mahjong.Tile where
 
-import GHC.Generics
+import Data.Data
 
--- | Basic functions of a Tile.
-class Tileable a where
+import Mahjong.Class (Cycle (..), Suit (..))
 
+-- | Tile describes the properties of a tile.
+class Tile a  where
   suit :: a -> Bool
   suit = not . honor
 
@@ -34,50 +19,21 @@ class Tileable a where
   simple :: a -> Bool
   simple = not . terminal
 
-  -- | Has a default instance uses `isBounds`, can be satisfied with just a -> Bool.
   terminal :: a -> Bool
   default terminal :: (Eq a, Bounded a) => a -> Bool
-  terminal a | suit a = isBounds a
-             | otherwise = False
+  terminal a
+    | suit a
+    , a == minBound || a == maxBound = True
+    | otherwise = False
 
   end :: a -> Bool
-  end a | honor a || terminal a = True
-        | otherwise = False
+  end a
+    | honor a || terminal a = True
+    | otherwise = False
 
--- | Simple function to test if something is at either bound of a Bounded
--- object. Useful when implementing terminal.
-isBounds :: (Eq a, Bounded a) => a -> Bool
-isBounds a | a == minBound || a == maxBound = True
-           | otherwise = False
-
--- | Enum and Bounded have a law that states that if succ a is equal to the
--- maxBound return an error and thus it's never a good idea to abuse these laws
--- for the type. Cycle on the other hand creates repeating infinite loops, which
--- is useful in the game of Mahjong for things like determining the dora or next
--- seat to be dealer.
-class Cycle a where
-
-  -- | The next tile in the cycle.
-  next :: a -> a
-
-  -- Eq, Enum, and Bounded already define the behavior that we are requesting
-  -- without breaking the laws.
-  default next :: (Eq a, Enum a, Bounded a) => a -> a
-  next a | a == maxBound = minBound
-         | otherwise = succ a
-
-  -- | The previous tile in the cycle
-  prev :: a -> a
-
-  -- Eq, Enum, and Bounded already define the behavior that we are requesting
-  -- without breaking the laws.
-  default prev :: (Eq a, Enum a, Bounded a) => a -> a
-  prev a | a == minBound = maxBound
-         | otherwise = pred a
-
--- | TNum represents the values with simple tiles like Character, Circle, and
+-- | SNum represents the values with simple tiles like Character, Circle, and
 -- Bamboo.
-data TNum
+data SNum
   = One
   | Two
   | Three
@@ -87,24 +43,26 @@ data TNum
   | Seven
   | Eight
   | Nine
-  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
+  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable)
 
-instance Cycle TNum
+instance Cycle SNum
 
-instance Tileable TNum where
+instance Suit SNum
+
+instance Tile SNum where
   honor _ = False
 
-newtype Character
-  = Character TNum
-  deriving (Generic, Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
+newtype Character =
+  Character SNum
+  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable, Cycle, Suit, Tile)
 
-newtype Circle
-  = Circle TNum
-  deriving (Generic, Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
+newtype Circle =
+  Circle SNum
+  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable, Cycle, Suit, Tile)
 
-newtype Bamboo
-  = Bamboo TNum
-  deriving (Generic, Eq, Ord, Bounded, Enum, Show, Cycle, Tileable)
+newtype Bamboo =
+  Bamboo SNum
+  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable, Cycle, Suit, Tile)
 
 -- | Wind represent the cardinal directions that can be found on Wind tiles, and
 -- their inherent ordering.
@@ -113,11 +71,11 @@ data Wind
   | South
   | West
   | North
-  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
+  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable)
 
 instance Cycle Wind
 
-instance Tileable Wind where
+instance Tile Wind where
   honor _ = True
 
 -- | Dragon represent the colors that can be found on Dragon tiles, and their
@@ -126,43 +84,75 @@ data Dragon
   = Red
   | White
   | Green
-  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
+  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable)
 
 instance Cycle Dragon
 
-instance Tileable Dragon where
+instance Tile Dragon where
   honor _ = True
 
-data Flower
-  = Plum
-  | Orchid
-  | Chrysanthemum
-  | BambooFlower
-  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
+-- | Sometimes we have to deal with tiles that are designated as a dora. Rarely
+-- during the course of the game do we have to treat them different whether they
+-- are in fact a dora or not. When dealing with this kind of situation it's best
+-- to just use a tuple. This way we can have the designation, use it when we
+-- would like to, and ignore it otherwise.
+--
+-- If you run into not wanting to deal with calling snd or fst on the tuple, you
+-- can just run the function over the structure with fmap. It only works on
+-- changing the second part of the tuple however.
+-- >>> fmap next (Dora, Five) == (Dora, Six)
+-- True
+data Dora
+  = Dora
+  | Normal
+  deriving (Eq, Ord, Show, Data, Typeable)
 
-instance Cycle Flower
+-- | In most winning hands of Mahjong, Melds are used to group tiles making a
+-- hand out of 1 Pair and 4 Melds; they also have a very big interaction in
+-- calculating a score for a winning hand
+data Meld a
+  = Run a
+        a
+        a
+    -- ^ Due to the nature of how `Steal` works, never expect Run to be in any
+    -- specific order, only that it will be of a single suit that isn't an
+    -- honor.
+  | Set a
+  | Quad a
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Data, Typeable)
 
-data Season
-  = Spring
-  | Summer
-  | Autumn
-  | Winter
-  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
+-- | This instance allows for you to check each Meld if they have any of the
+-- traits that the tiles within the Meld have. Turns out to be useful when you
+-- are checking the logic for Melds with scoring in mind.
+instance Tile a => Tile (Meld a) where
+  honor = any honor
 
-instance Cycle Season
+  terminal = any terminal
 
--- | Animal tiles are special tiles that form pairs in some variants of Mahjong.
-data Animal
-  = Cat       | Mouse
-  | Rooster   | Centipede
-  | RichMan   | PotOfGold
-  | Fisherman | Fish
-  deriving (Generic, Eq, Ord, Bounded, Enum, Show)
+-- | A Wait is an unfinished Meld and allows you to reason about what do you
+-- need to get closer to Tenpai (one tile from a winning hand).
+data Wait a
+  = WRun a
+         a
+    -- ^ We don't specify the tile we are waiting for so that you don't have to
+    -- treat multisided waits differently.
+  | WPair a
+    -- ^ Pair is wait for a Set, and Set will naturally be wait for a Quad.
+  | WSingle a
+    -- ^ A single tile can be a wait for a Pair or part of hands like kokushi
+    -- musou (Thirteen Orphans: Each terminal and honor, and a single pair of
+    -- any other tile in the hand).
+  deriving (Eq, Ord, Show, Functor, Data, Typeable)
 
-instance Cycle Animal
+-- | Pairs are used specifically in hands so we'll create a newtype to deal with
+-- them directly rather than Waits.
+newtype Pair a =
+  Pair (Wait a)
+  deriving (Functor, Show)
 
--- | Testing if two Animals can be put into a pair together.
-isAnimalPair :: Animal -> Animal -> Bool
-isAnimalPair at1 at2 = setNumber at1 == setNumber at2
-  where
-    setNumber at = div (fromEnum at) 2
+-- | The SAFE way to make a Pair off only a `WPair`.
+pair :: Wait a -> Maybe (Pair a)
+pair =
+  \case
+    a@WPair {} -> Just (Pair a)
+    _ -> Nothing
