@@ -1,9 +1,7 @@
-{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 -- | Stability: Experimental
 module Mahjong.Player where
-
-import Data.Data
 
 import Mahjong.Class
 import Mahjong.Tile
@@ -18,8 +16,7 @@ import Mahjong.Tile
 -- clients.
 data Steal a
   = Steal PlayerSeat (Meld a)
-  deriving ( Eq, Show
-           , Data, Typeable )
+  deriving (Eq, Show)
 
 instance Functor Steal where
   fmap fn (Steal s a) = Steal s (fmap fn a)
@@ -36,22 +33,22 @@ data Player a
     , stolenMelds :: [Steal a]
     , discardPile :: [a]
     , tenpaiState :: Tenpai }
-  deriving ( Show
-           , Data, Typeable )
+  deriving (Show)
 
 defaultPlayer :: Player a
 defaultPlayer = Player 25000 mempty [] [] NotInTenpai
 
 newtype PlayerHand a
   = PlayerHand [a]
-  deriving ( Monoid, Show
-           , Data, Typeable )
+  deriving (Monoid, Show)
+
+addToHand :: PlayerHand a -> a -> PlayerHand a
+addToHand (PlayerHand as) a
+  = PlayerHand (a : as)
 
 newtype PlayerSeat
   = Seat Wind
-  deriving ( Eq, Ord, Enum, Bounded, Show
-           , Data, Typeable
-           , Cycle )
+  deriving (Eq, Ord, Enum, Bounded, Show, Cycle)
 
 -- | Player property sum type that allows us to not have to calculate whether
 -- they are in tenpai every round. Some special conditions may have to be
@@ -69,5 +66,4 @@ data Tenpai
     -- than a self draw due to the player discarding a tile that would currently
     -- let them win. This rule can also be found under the name of 'Sacred
     -- Discard'.
-  deriving ( Eq, Show
-           , Data, Typeable )
+  deriving (Eq, Show)

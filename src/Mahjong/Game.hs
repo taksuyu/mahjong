@@ -5,7 +5,6 @@ module Mahjong.Game where
 
 import Data.List.NonEmpty as NonEmpty
 import Data.MultiSet      as MS
-import Data.Semigroup
 import Data.Set           as S
 
 -- import Mahjong.Hand

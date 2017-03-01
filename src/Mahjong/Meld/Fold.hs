@@ -1,16 +1,9 @@
-{-# LANGUAGE CPP #-}
-
 -- | This module is for folds that make up meld functionality. As we don't want
 -- to make assumptions as to what the user will be using for their own
 -- applications and we ourselves would like something kind of flexible. This
 -- package has chosen to support a `Foldable` input and a `Set` output which you
 -- can find by functions of the same name in `Mahjong.Meld`.
 module Mahjong.Meld.Fold where
-
-#if (! MIN_VERSION_base(4,8,0))
-import Data.Foldable
-import Prelude       hiding (any, elem, foldl)
-#endif
 
 import Data.Monoid
 

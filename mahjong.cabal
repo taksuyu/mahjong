@@ -1,5 +1,5 @@
 name:                mahjong
-version:             0.1.0.0
+version:             0.1.0
 -- synopsis:
 -- description:
 homepage:            https://github.com/taksuyu/mahjong#readme
@@ -17,8 +17,6 @@ library
   hs-source-dirs:      src
   exposed-modules:     Mahjong.Board
                      , Mahjong.Class
-                     , Mahjong.Class.Cycle
-                     , Mahjong.Class.Suit
                      , Mahjong.Game
                      , Mahjong.Hand
                      , Mahjong.Meld.Fold
@@ -30,7 +28,6 @@ library
   build-depends:       base >= 4.7 && < 5
                      , containers
                      , multiset
-                     , uniplate
                      , unordered-containers
   default-language:    Haskell2010
 

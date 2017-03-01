@@ -1,7 +1,3 @@
-Haskell mahjong library
-
-------
-
 ## Versioning
 
 This project uses semvar for it's versioning and currently we are still in the

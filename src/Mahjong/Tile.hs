@@ -1,35 +1,10 @@
-{-# LANGUAGE DefaultSignatures, DeriveDataTypeable, DeriveFoldable,
-             DeriveFunctor, DeriveTraversable, GeneralizedNewtypeDeriving,
+{-# LANGUAGE DeriveFunctor, DeriveTraversable, GeneralizedNewtypeDeriving,
              LambdaCase, MultiParamTypeClasses #-}
 
 -- | Stability: Stable
 module Mahjong.Tile where
 
-import Data.Data
-
-import Mahjong.Class (Cycle (..), Suit (..))
-
--- | Tile describes the properties of a tile.
-class Tile a  where
-  suit :: a -> Bool
-  suit = not . honor
-
-  honor :: a -> Bool
-
-  simple :: a -> Bool
-  simple = not . terminal
-
-  terminal :: a -> Bool
-  default terminal :: (Eq a, Bounded a) => a -> Bool
-  terminal a
-    | suit a
-    , a == minBound || a == maxBound = True
-    | otherwise = False
-
-  end :: a -> Bool
-  end a
-    | honor a || terminal a = True
-    | otherwise = False
+import Mahjong.Class
 
 -- | SNum represents the values with simple tiles like Character, Circle, and
 -- Bamboo.
@@ -43,7 +18,7 @@ data SNum
   | Seven
   | Eight
   | Nine
-  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable)
+  deriving (Eq, Ord, Bounded, Enum, Show)
 
 instance Cycle SNum
 
@@ -54,15 +29,15 @@ instance Tile SNum where
 
 newtype Character =
   Character SNum
-  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable, Cycle, Suit, Tile)
+  deriving (Eq, Ord, Bounded, Enum, Show, Cycle, Suit, Tile)
 
 newtype Circle =
   Circle SNum
-  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable, Cycle, Suit, Tile)
+  deriving (Eq, Ord, Bounded, Enum, Show, Cycle, Suit, Tile)
 
 newtype Bamboo =
   Bamboo SNum
-  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable, Cycle, Suit, Tile)
+  deriving (Eq, Ord, Bounded, Enum, Show, Cycle, Suit, Tile)
 
 -- | Wind represent the cardinal directions that can be found on Wind tiles, and
 -- their inherent ordering.
@@ -71,7 +46,7 @@ data Wind
   | South
   | West
   | North
-  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable)
+  deriving (Eq, Ord, Bounded, Enum, Show)
 
 instance Cycle Wind
 
@@ -84,7 +59,7 @@ data Dragon
   = Red
   | White
   | Green
-  deriving (Eq, Ord, Bounded, Enum, Show, Data, Typeable)
+  deriving (Eq, Ord, Bounded, Enum, Show)
 
 instance Cycle Dragon
 
@@ -105,7 +80,7 @@ instance Tile Dragon where
 data Dora
   = Dora
   | Normal
-  deriving (Eq, Ord, Show, Data, Typeable)
+  deriving (Eq, Ord, Show)
 
 -- | In most winning hands of Mahjong, Melds are used to group tiles making a
 -- hand out of 1 Pair and 4 Melds; they also have a very big interaction in
@@ -119,7 +94,7 @@ data Meld a
     -- honor.
   | Set a
   | Quad a
-  deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Data, Typeable)
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 -- | This instance allows for you to check each Meld if they have any of the
 -- traits that the tiles within the Meld have. Turns out to be useful when you
@@ -142,7 +117,7 @@ data Wait a
     -- ^ A single tile can be a wait for a Pair or part of hands like kokushi
     -- musou (Thirteen Orphans: Each terminal and honor, and a single pair of
     -- any other tile in the hand).
-  deriving (Eq, Ord, Show, Functor, Data, Typeable)
+  deriving (Eq, Ord, Show, Functor)
 
 -- | Pairs are used specifically in hands so we'll create a newtype to deal with
 -- them directly rather than Waits.

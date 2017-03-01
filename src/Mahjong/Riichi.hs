@@ -1,10 +1,8 @@
-{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, LambdaCase #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, LambdaCase, RecordWildCards #-}
 
 -- | Stability: Experimental
 module Mahjong.Riichi where
 
-import Data.Data
-import Data.Generics.Uniplate.Data
 import Data.List                   as L (delete)
 -- import Data.MultiSet               as MS
 
@@ -15,7 +13,8 @@ import Mahjong.Tile
 
 -- * Riichi tiles
 
-type RiichiPlayer = Player (Dora, RiichiTile)
+type RiichiPlayer 
+  = Player (Dora, RiichiTile)
 
 data RiichiTile
   = CharacterT Character
@@ -23,8 +22,7 @@ data RiichiTile
   | BambooT Bamboo
   | WindT Wind
   | DragonT Dragon
-  deriving ( Eq, Show
-           , Data, Typeable )
+  deriving (Eq, Show)
 
 instance Tile RiichiTile where
   honor = \case
@@ -60,7 +58,12 @@ isBounds a | a == minBound || a == maxBound = True
 -- | When you work with tiles you'll want some way to be able to check if two
 -- tiles are of the same type.
 sameGroup :: RiichiTile -> RiichiTile -> Bool
-sameGroup a b = toConstr a == toConstr b
+sameGroup (CharacterT _) (CharacterT _) = True
+sameGroup (CircleT _)    (CircleT _)    = True
+sameGroup (BambooT _)    (BambooT _)    = True
+sameGroup (WindT _)      (WindT _)      = True
+sameGroup (DragonT _)    (DragonT _)    = True
+sameGroup _ _                           = False
 
 -- * Hand
 
@@ -97,8 +100,8 @@ takeFrom t ts message
 -- game being played) will end in a draw unless the current player wins, or a
 -- player wins off this player's discard.
 playerDraw :: (Dora, RiichiTile) -> RiichiPlayer -> RiichiPlayer
-playerDraw dt
-  = transformBi (\ (PlayerHand h) -> PlayerHand (dt : h) )
+playerDraw dt player@Player{..}
+  = player { hand = addToHand hand dt}
 
 -- | Discarding has a few side effects that we have to watch out for like if a
 -- player gives an invalid tile from the outside. To handle this we will return

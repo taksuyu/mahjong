@@ -1,6 +1,6 @@
-{-# LANGUAGE DeriveDataTypeable, FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
 
--- | Stability: Experimentalm
+-- | Stability: Experimental
 module Mahjong.Hand where
 
 import Data.Data
@@ -26,8 +26,7 @@ data Hand
     , bamboo     :: MultiSet (Dora, Bamboo)
     , winds      :: MultiSet (Dora, Wind)
     , dragons    :: MultiSet (Dora, Dragon) }
-  deriving ( Show
-           , Data, Typeable )
+  deriving (Show)
 
 instance Monoid Hand where
   mempty = Hand empty empty empty empty empty
