@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveFunctor, DeriveTraversable, GeneralizedNewtypeDeriving,
-             LambdaCase, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveFunctor, DeriveTraversable, FlexibleInstances,
+             GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses #-}
 
 -- | Stability: Stable
 module Mahjong.Tile where
@@ -105,6 +105,11 @@ data Dora
   = Dora
   | Normal
   deriving (Eq, Ord, Show)
+
+instance Tile t => Tile (Dora, t) where
+  honor (_, t) = honor t
+
+  terminal (_, t) = terminal t
 
 -- | In most winning hands of Mahjong, Melds are used to group tiles making a
 -- hand out of 1 Pair and 4 Melds; they also have a very big interaction in
