@@ -1,11 +1,7 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
-
 -- | Stability: Experimental
 module Mahjong.Hand where
 
-import Data.Data
-
-import Data.MultiSet
+import qualified Data.MultiSet as MS
 
 import Mahjong.Tile
 
@@ -21,14 +17,14 @@ import Mahjong.Tile
 -- interact with when it's abstracted out.
 data Hand
   = Hand
-    { characters :: MultiSet (Dora, Character)
-    , circles    :: MultiSet (Dora, Circle)
-    , bamboo     :: MultiSet (Dora, Bamboo)
-    , winds      :: MultiSet (Dora, Wind)
-    , dragons    :: MultiSet (Dora, Dragon) }
+    { characters :: MS.MultiSet (Dora, Character)
+    , circles    :: MS.MultiSet (Dora, Circle)
+    , bamboo     :: MS.MultiSet (Dora, Bamboo)
+    , winds      :: MS.MultiSet (Dora, Wind)
+    , dragons    :: MS.MultiSet (Dora, Dragon) }
   deriving (Show)
 
 instance Monoid Hand where
-  mempty = Hand empty empty empty empty empty
+  mempty = Hand MS.empty MS.empty MS.empty MS.empty MS.empty
   Hand a b c d e `mappend` Hand l m n o p
     = Hand (a `mappend` l) (b `mappend` m) (c `mappend` n) (d `mappend` o) (e `mappend` p)
