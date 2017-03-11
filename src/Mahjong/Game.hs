@@ -3,12 +3,10 @@
 -- | Stability: Experimental
 module Mahjong.Game where
 
-import Data.List.NonEmpty as NonEmpty
-import Data.MultiSet      as MS
-import Data.Set           as S
+import qualified Data.MultiSet as MS
 
--- import Mahjong.Hand
-import Mahjong.Tile
+import Data.List.NonEmpty as NE (NonEmpty(..), nonEmpty)
+import Data.Maybe
 
 -- | When a portion of a hand is settled, then it has no excess and needs
 -- nothing to be settled. On the other hand if a portion of a hand needs a tile
@@ -25,88 +23,54 @@ data Settle
   = Settled
   | Open
 
--- | A set of elements that are related directly to each other.
-newtype Contiguous a = C (Set a)
-  deriving (Eq, Ord, Show)
+type Section t = NonEmpty (t, Int)
+type Segment t = NonEmpty (Section t)
 
-getContiguous :: (Ord a, Enum a, Bounded a) => MultiSet a -> [Contiguous a]
-getContiguous ms
-  | MS.null ms = []
-  | otherwise = let s = toSet ms
-    in splitOnBreak s ++ getContiguous (ms `MS.difference` fromSet s)
+pattern Edge :: (Num a, Eq a) => t -> NonEmpty (t, a)
+pattern Edge t = (t, 1) :| []
 
-splitOnBreak :: (Ord a, Enum a, Bounded a) => Set a -> [Contiguous a]
-splitOnBreak s
-  = checkSucc start s
+-- | For suits that allow runs we can use `Segment` to find areas of interest
+-- for us to solve while looking for short circuits if we would rather not solve
+-- a hand that isn't finished.
+findSegments :: (Ord a, Bounded a, Enum a) => MS.MultiSet a -> Maybe (Segment a)
+findSegments ms = let min' = MS.findMin ms in
+  nonEmpty . mapMaybe (nonEmpty . MS.toAscOccurList) $ splitSegments (missingMembers min' ms) ms
+    where
+      missingMembers :: (Ord a, Bounded a, Enum a) => a -> MS.MultiSet a -> [a]
+      missingMembers a ms'
+        | a == maxBound
+          = []
+        | MS.notMember (succ a) ms'
+          = succ a : missingMembers (succ a) ms'
+        | otherwise
+          = missingMembers (succ a) ms'
+
+      splitSegments :: (Ord a, Bounded a, Enum a) => [a] -> MS.MultiSet a -> [MS.MultiSet a]
+      splitSegments [] ms' = [ms']
+      splitSegments (x : xs) ms' = let (a, b) = MS.split x ms' in
+        if MS.null b
+        then [a]
+        else a : splitSegments xs b
+
+-- | An edge allows us to short circuit any segment calculation on suit tiles.
+--
+-- Segments really should only be used on suits and the assumption is that is
+-- the case. If you have a case where that isn't the case please open a bug
+-- report explaining the situation.
+edges :: Segment t -> Bool
+edges s = any (isEdge) s
   where
-    start = S.findMin s
+    isEdge (Edge _) = True
+    isEdge _ = False
 
-    checkSucc :: (Ord a, Enum a, Bounded a) => a -> Set a -> [Contiguous a]
-    checkSucc enum set
-      | enum /= maxBound
-      , succ enum `S.member` set
-      = checkSucc (succ enum) set
-      | enum == maxBound
-      = [C set]
-      | otherwise
-      = let (a, b) = succ enum `S.split` set
-        in if not . S.null $ a
-        then C a : checkSucc (succ enum) b
-        else checkSucc (succ enum) b
+pattern Single :: (Num a, Eq a) => t -> (t, a)
+pattern Single t = (t, 1)
 
--- data Pivot a
---   = Pivot [Pivot a]
---     -- ^ Any number of types where only one can be chosen.
---   | Group [a]
---     -- ^ Any number of types that can all be chosen.
---   | Edge a
---     -- ^ A single type that can be chosen.
---   deriving (Show)
+pattern Pair :: (Num a, Eq a) => t -> (t, a)
+pattern Pair t = (t, 2)
 
--- instance Functor Pivot where
---   fmap fn (Pivot a) = Pivot (fmap (fmap fn) a)
---   fmap fn (Group a) = Group (fmap fn a)
---   fmap fn (Edge  a) = Edge  (fn a)
+pattern Set :: (Num a, Eq a) => t -> (t, a)
+pattern Set t = (t, 3)
 
--- instance Foldable Pivot where
---   foldr fn b (Pivot a)
---     = Prelude.foldr (flip $ Prelude.foldr fn) b a
---   foldr fn b (Group a)
---     = Prelude.foldr fn b a
---   foldr fn b (Edge a)
---     = fn a b
-
--- instance Traversable Pivot where
---   traverse fn (Pivot a) = Pivot <$> traverse (traverse fn) a
---   traverse fn (Group a) = Group <$> traverse fn a
---   traverse fn (Edge  a) = Edge  <$> fn a
-
--- -- f :: [a] -> Pivot a
-
--- getEdges :: Pivot a -> Maybe [a]
--- getEdges (Pivot a) = Prelude.foldr (mappend . getEdges) Nothing a
--- getEdges (Group _) = Nothing
--- getEdges (Edge  a) = Just [a]
-
--- getGroups :: Pivot a -> Maybe [[a]]
--- getGroups (Pivot a) = Prelude.foldr (mappend . getGroups) Nothing a
--- getGroups (Group a) = Just [a]
--- getGroups (Edge  _) = Nothing
-
--- mergeable :: a -> a -> Bool
--- tryMerge :: a -> a -> Maybe [a]
-
-newtype Pivot a = Pivot
-  { unPivot :: NonEmpty (Group a)
-  }
--- newtype Group' a = Group' { unGroup :: NonEmpty a }
--- pattern Edge' a  = Group' (a :| [])
-
-data Group a
-  = MeldG (Meld a)
-  | WaitG (Wait a)
-
--- recover (pivot xs) == xs
--- recover :: Semigroup a => Pivot a -> a
--- recover =
---   sconcat . unGroup . NonEmpty.head . unPivot
+pattern Quad :: (Num a, Eq a) => t -> (t, a)
+pattern Quad t = (t, 4)
